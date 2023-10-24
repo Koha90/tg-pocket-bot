@@ -5,25 +5,35 @@ import (
 	"log"
 
 	"github.com/koha90/tg-pocket-bot/clients/telegram"
+	event_consumer "github.com/koha90/tg-pocket-bot/consumer/event-consumer"
+	tg "github.com/koha90/tg-pocket-bot/events/telegram"
+	"github.com/koha90/tg-pocket-bot/storage/files"
 )
 
 const (
-	tgBotHost = "api.telegram.org"
+	tgBotHost   = "api.telegram.org"
+	storagePath = "storage"
+	batchSize   = 100
 )
 
 func main() {
-	tgClient := telegram.New(tgBotHost, mustToken())
+	eventsProcessor := tg.New(
+		telegram.New(tgBotHost, mustToken()),
+		files.New(storagePath),
+	)
 
-	// fetcher = fetcher.New()
+	log.Print("service started")
 
-	// processor = processor.New()
+	consumer := event_consumer.New(eventsProcessor, eventsProcessor, batchSize)
 
-	// consumer.Start(fetcher, processor)
+	if err := consumer.Start(); err != nil {
+		log.Fatal("service is stoped", err)
+	}
 }
 
 func mustToken() string {
 	token := flag.String(
-		"token-bot-token",
+		"tg-bot-token",
 		"",
 		"token for access to telegram bot",
 	)

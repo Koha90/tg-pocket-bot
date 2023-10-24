@@ -61,8 +61,6 @@ func (p *Processor) Process(event events.Event) error {
 	switch event.Type {
 	case events.Message:
 		return p.processMessage(event)
-	case events.Callback:
-		return p.processMessage(event)
 	default:
 		return e.Wrap("can't process event", ErrUnknownEventType)
 	}
